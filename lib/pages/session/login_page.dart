@@ -1,0 +1,135 @@
+import 'package:flutter/material.dart';
+import 'package:just_cook_it/pages/session/signin_page.dart';
+import 'package:just_cook_it/pages/start/start_page.dart';
+
+class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Controladores para os campos de texto de email e senha.
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 18, 191, 136),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        elevation: 0,
+      ),
+      backgroundColor: const Color.fromARGB(255, 18, 191, 136), // Fundo verde
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(
+                  height: 100,
+                  child:
+                      Image.asset('assets/logo1.png'), // Coloque seu logo aqui
+                ),
+                const SizedBox(height: 24.0),
+                const Center(
+                  child: Text(
+                    'Login',
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24.0),
+                Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: <Widget>[
+                      TextField(
+                        controller: emailController, // Associa o controlador.
+                        decoration: const InputDecoration(
+                          labelText: 'Email', // Rótulo do campo de texto.
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 16.0),
+                      TextField(
+                        controller:
+                            passwordController, // Associa o controlador.
+                        decoration: const InputDecoration(
+                          labelText: 'Senha', // Rótulo do campo de texto.
+                          border: OutlineInputBorder(),
+                        ),
+                        obscureText: true, // Oculta o texto digitado (senha).
+                      ),
+                      const SizedBox(height: 24.0),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(16.0),
+                          backgroundColor:
+                              const Color.fromARGB(255, 18, 191, 136), // Verde
+                        ),
+                        onPressed: () async {
+                          // Obtém os valores dos campos de texto.
+                          String email = emailController.text;
+                          String password = passwordController.text;
+
+                          // Tenta fazer login com os dados fornecidos.
+                          // Map<String, dynamic>? userData =
+                          //     await loginUser(email, password);
+
+                          // Se o login for bem-sucedido, navega para a página de dashboard.
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const StartPage(),
+                            ),
+                          );
+                        },
+                        child: const Text('Login'),
+                      ),
+                      const SizedBox(height: 16.0),
+                      TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor:
+                              const Color.fromARGB(255, 18, 191, 136), // Verde
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignInPage()),
+                          );
+                        },
+                        child: const Text(
+                            'Não possui uma conta? Cadastre-se aqui'),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
