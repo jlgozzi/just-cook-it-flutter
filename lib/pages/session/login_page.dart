@@ -1,28 +1,70 @@
 import 'package:flutter/material.dart';
-import 'package:just_cook_it/pages/session/signin_page.dart';
-import 'package:just_cook_it/pages/start/start_page.dart';
+import 'package:just_cook_it/pages/dashboard/dashboard_page.dart';
+import 'package:just_cook_it/services/auth_service.dart';
+import 'package:just_cook_it/theme/app_colors.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // Controladores para os campos de texto de email e senha.
-    final TextEditingController emailController = TextEditingController();
-    final TextEditingController passwordController = TextEditingController();
+  State<LoginPage> createState() => _LoginPageState();
+}
 
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
+  final _formKey = GlobalKey<FormState>();
+
+  void _loginUser() async {
+    if (_formKey.currentState?.validate() ?? false) {
+      try {
+        final authService = AuthService();
+        final user = await authService.loginUser(
+          emailController.text.trim(),
+          passwordController.text,
+        );
+
+        if (user != null) {
+          // Redireciona para a DashboardPage
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const DashboardPage()),
+          );
+        }
+      } catch (e) {
+        // Mostra uma mensagem de erro
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Erro!'),
+            content: Text(e.toString()),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 18, 191, 136),
+        backgroundColor: AppColors.background,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back),
+          color: AppColors.primary,
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
         elevation: 0,
       ),
-      backgroundColor: const Color.fromARGB(255, 18, 191, 136), // Fundo verde
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
@@ -32,8 +74,7 @@ class LoginPage extends StatelessWidget {
               children: <Widget>[
                 SizedBox(
                   height: 100,
-                  child:
-                      Image.asset('assets/logo1.png'), // Coloque seu logo aqui
+                  child: Image.asset('logo1.png'),
                 ),
                 const SizedBox(height: 24.0),
                 const Center(
@@ -42,7 +83,7 @@ class LoginPage extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 24.0,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                 ),
@@ -50,79 +91,94 @@ class LoginPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppColors.background,
                     borderRadius: BorderRadius.circular(10.0),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
+                        color: AppColors.shadow,
                         spreadRadius: 2,
                         blurRadius: 5,
-                        offset: const Offset(0, 2),
+                        offset: Offset(0, 2),
                       ),
                     ],
                   ),
-                  child: Column(
-                    children: <Widget>[
-                      TextField(
-                        controller: emailController, // Associa o controlador.
-                        decoration: const InputDecoration(
-                          labelText: 'Email', // Rótulo do campo de texto.
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      const SizedBox(height: 16.0),
-                      TextField(
-                        controller:
-                            passwordController, // Associa o controlador.
-                        decoration: const InputDecoration(
-                          labelText: 'Senha', // Rótulo do campo de texto.
-                          border: OutlineInputBorder(),
-                        ),
-                        obscureText: true, // Oculta o texto digitado (senha).
-                      ),
-                      const SizedBox(height: 24.0),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(16.0),
-                          backgroundColor:
-                              const Color.fromARGB(255, 18, 191, 136), // Verde
-                        ),
-                        onPressed: () async {
-                          // Obtém os valores dos campos de texto.
-                          String email = emailController.text;
-                          String password = passwordController.text;
-
-                          // Tenta fazer login com os dados fornecidos.
-                          // Map<String, dynamic>? userData =
-                          //     await loginUser(email, password);
-
-                          // Se o login for bem-sucedido, navega para a página de dashboard.
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const StartPage(),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        TextFormField(
+                          controller: emailController,
+                          decoration: const InputDecoration(
+                            labelText: 'Email',
+                            labelStyle: TextStyle(color: AppColors.textPrimary),
+                            border: OutlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.shadow),
                             ),
-                          );
-                        },
-                        child: const Text('Login'),
-                      ),
-                      const SizedBox(height: 16.0),
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          foregroundColor:
-                              const Color.fromARGB(255, 18, 191, 136), // Verde
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Email é obrigatório';
+                            }
+                            const emailPattern = r'^[^@]+@[^@]+\.[^@]+$';
+                            final regExp = RegExp(emailPattern);
+                            if (!regExp.hasMatch(value)) {
+                              return 'Insira um email válido';
+                            }
+                            return null;
+                          },
                         ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SignInPage()),
-                          );
-                        },
-                        child: const Text(
-                            'Não possui uma conta? Cadastre-se aqui'),
-                      ),
-                    ],
+                        const SizedBox(height: 16.0),
+                        TextFormField(
+                          controller: passwordController,
+                          obscureText: !_isPasswordVisible,
+                          decoration: InputDecoration(
+                            labelText: 'Senha',
+                            labelStyle:
+                                const TextStyle(color: AppColors.textPrimary),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: AppColors.primary,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isPasswordVisible = !_isPasswordVisible;
+                                });
+                              },
+                            ),
+                            border: const OutlineInputBorder(
+                              borderSide: BorderSide(color: AppColors.shadow),
+                            ),
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Senha é obrigatória';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 24.0),
+                        ElevatedButton(
+                          onPressed: _loginUser,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16.0, horizontal: 32.0),
+                          ),
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(
+                              color: AppColors.background,
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],

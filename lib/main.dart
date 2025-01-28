@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:just_cook_it/database/firebase_config.dart';
@@ -7,11 +8,29 @@ import 'package:just_cook_it/theme/app_colors.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  try {
-    await FirebaseConfig.initialize();
-  } catch (e) {
-    print('Cannot connect to firebase');
+  await Firebase.initializeApp(
+      options: const FirebaseOptions(
+    apiKey: "AIzaSyDLmbKqojEafe_PWyduCvwvtnVhH5rfgIo",
+    authDomain: "just-cook-it-47a29.firebaseapp.com",
+    projectId: "just-cook-it-47a29",
+    storageBucket: "just-cook-it-47a29.firebasestorage.app",
+    messagingSenderId: "314391866357",
+    appId: "1:314391866357:web:0abe293eeaa08e072dcebc",
+    measurementId: "G-D4SV38GP13",
+  ));
+
+  if (Firebase.apps.isNotEmpty) {
+    debugPrint('Firebase inicializado com sucesso!');
+  } else {
+    debugPrint('Firebase NÃO foi inicializado.');
   }
+
+  // try {
+  //   await FirebaseAuth.instance.signInAnonymously();
+  //   debugPrint('Conexão com Firebase Authentication bem-sucedida!');
+  // } catch (e) {
+  //   debugPrint('Erro na conexão com Firebase Authentication: $e');
+  // }
 
   runApp(const MyApp());
 }

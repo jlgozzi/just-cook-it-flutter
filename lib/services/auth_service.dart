@@ -17,6 +17,24 @@ class AuthService {
 
       return userCredential.user;
     } on FirebaseAuthException catch (e) {
+      print(e);
+      throw Exception(e.message);
+    }
+  }
+
+  // Login de usuário
+  Future<User?> loginUser(String email, String password) async {
+    try {
+      // Tenta fazer login com email e senha
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      // Retorna o usuário logado
+      return userCredential.user;
+    } on FirebaseAuthException catch (e) {
+      print('Erro ao fazer login: $e');
       throw Exception(e.message);
     }
   }

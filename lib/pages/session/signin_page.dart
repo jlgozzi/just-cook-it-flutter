@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:just_cook_it/pages/session/login_page.dart';
 import 'package:just_cook_it/services/auth_service.dart';
 import 'package:just_cook_it/theme/app_colors.dart';
 
@@ -14,11 +13,8 @@ class _SignInPageState extends State<SignInPage> {
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController =
-      TextEditingController();
   bool isTermsAccepted = false;
   bool _isPasswordVisible = false;
-  final bool _isConfirmPasswordVisible = false;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -57,22 +53,57 @@ class _SignInPageState extends State<SignInPage> {
         );
 
         if (user != null) {
-          // _showSuccessDialog(); // Mostra diálogo de sucesso
+          _showSuccessDialog();
         }
       } catch (e) {
-        // _showErrorDialog(e.toString()); // Mostra mensagem de erro
+        _showErrorDialog(e.toString());
       }
     }
+  }
+
+  void _showSuccessDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sucesso!'),
+        content: const Text('Usuário registrado com sucesso!'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pop(); // Voltar para a tela anterior
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showErrorDialog(String errorMessage) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Erro!'),
+        content: Text(errorMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors.background, // Cor principal
+        backgroundColor: AppColors.background,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          color: AppColors.primary, // Cor dos ícones
+          color: AppColors.primary,
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -88,24 +119,22 @@ class _SignInPageState extends State<SignInPage> {
               children: <Widget>[
                 SizedBox(
                   height: 100,
-                  child: Image.asset('assets/logo1.png'),
+                  child: Image.asset('logo1.png'),
                 ),
                 const SizedBox(height: 24.0),
-                const Center(
-                  child: Text(
-                    'Registrar',
-                    style: TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary, // Texto principal
-                    ),
+                const Text(
+                  'Registrar',
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 24.0),
                 Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
-                    color: AppColors.background, // Fundo do formulário
+                    color: AppColors.background,
                     borderRadius: BorderRadius.circular(10.0),
                     boxShadow: const [
                       BoxShadow(
@@ -126,10 +155,7 @@ class _SignInPageState extends State<SignInPage> {
                           decoration: const InputDecoration(
                             labelText: 'Nome completo',
                             labelStyle: TextStyle(color: AppColors.textPrimary),
-                            border: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: AppColors.textSecondary),
-                            ),
+                            border: OutlineInputBorder(),
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
@@ -144,9 +170,7 @@ class _SignInPageState extends State<SignInPage> {
                           decoration: const InputDecoration(
                             labelText: 'Email',
                             labelStyle: TextStyle(color: AppColors.textPrimary),
-                            border: OutlineInputBorder(
-                              borderSide: BorderSide(color: AppColors.shadow),
-                            ),
+                            border: OutlineInputBorder(),
                           ),
                           validator: _validateEmail,
                         ),
@@ -171,14 +195,25 @@ class _SignInPageState extends State<SignInPage> {
                                 });
                               },
                             ),
-                            border: const OutlineInputBorder(
-                              borderSide: BorderSide(color: AppColors.shadow),
-                            ),
+                            border: const OutlineInputBorder(),
                           ),
                           validator: _validatePassword,
                         ),
-                        const SizedBox(height: 16.0),
-                        // Outros campos continuam com a mesma lógica de cores...
+                        const SizedBox(height: 24.0),
+                        ElevatedButton(
+                          onPressed: _registerUser,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            padding: const EdgeInsets.symmetric(vertical: 16.0),
+                          ),
+                          child: const Text(
+                            'Registrar',
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
